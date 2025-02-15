@@ -246,9 +246,9 @@ graph:
     width: 151
     height: 51
     color: blue
-    max_range: 500
+    max_range: 1000
     min_range: 1
-    max_value: 500
+    max_value: 1000
     min_value: 1
     line_type: SOLID
   - id: temperature_graph_24h
@@ -306,9 +306,9 @@ graph:
     width: 151
     height: 51
     color: blue
-    max_range: 500
+    max_range: 1000
     min_range: 1
-    max_value: 500
+    max_value: 1000
     min_value: 1
     line_type: SOLID
 
@@ -373,7 +373,7 @@ display:
         pos += 60;
         it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "ppb"      );
         it.printf(75, pos + 37, fl18, id(white), TextAlign::BOTTOM_RIGHT, "VOC"      );
-        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "1..500"   );
+        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "1..1000"   );
         it.graph (80, pos     , id(voc_graph   ));
 
       } else if (id(page_number) == 2) {
@@ -407,7 +407,7 @@ display:
         pos += 60;
         it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "ppb"      );
         it.printf(75, pos + 37, fl18, id(white), TextAlign::BOTTOM_RIGHT, "VOC"      );
-        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "1..500"   );
+        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "1..1000"   );
         it.graph (80, pos     , id(voc_graph_24h   ));
 
       } else {
