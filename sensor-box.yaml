@@ -220,8 +220,8 @@ graph:
     width: 151
     height: 51
     color: magenta
-    max_range: 1050
-    min_range: 950
+    max_range: 100
+    min_range: 1
     max_value: 1050
     min_value: 950
     line_type: SOLID
