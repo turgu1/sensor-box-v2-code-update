@@ -57,18 +57,20 @@ captive_portal:
 debug:
   update_interval: 5s
 
-# Display dimming
 globals:
-  - id: dbright
+  - id: dbright # Display dimming brightness
     type: int
     restore_value: no
-    initial_value: '0'
-  - id: show_graphics
-    type: bool
+    initial_value: "0"
+  - id: page_number # current page number (0 = first page)
+    type: int
     restore_value: no
-    initial_value: 'false'
-  
-     
+    initial_value: "0"
+  - id: page_count
+    type: int
+    restore_value: no
+    initial_value: "3"
+
 output:
   - platform: ledc
     pin: GPIO15
@@ -98,7 +100,7 @@ binary_sensor:
         max_length: 350ms
         then:
           - lambda: |-
-              id(show_graphics) = !id(show_graphics);
+              id(page_number) = (id(page_number) + 1) % id(page_count);
     on_click: 
     - min_length: 500ms
       max_length: 1200ms
@@ -186,11 +188,11 @@ color:
     hex: 00FFFF
   - id: magenta
     hex: FF00FF
-
+  
 graph:
   # Show bare-minimum auto-ranged graph
   - id: temperature_graph
-    sensor: temp_scd40
+    sensor: temperature
     duration: 1h
     x_grid: 10min
     width: 151
@@ -202,7 +204,7 @@ graph:
     min_value: 15 # idem
     line_type: SOLID
   - id: humidity_graph
-    sensor: hum_scd40
+    sensor: humidity
     duration: 1h
     x_grid: 10min
     width: 151
@@ -249,6 +251,66 @@ graph:
     max_value: 500
     min_value: 1
     line_type: SOLID
+  - id: temperature_graph_24h
+    sensor: temperature
+    duration: 24h
+    x_grid: 4h
+    width: 151
+    height: 51
+    color: blue
+    max_range: 30 # Change values from environement context
+    min_range: 15 # idem
+    max_value: 30 # Change values from environement context
+    min_value: 15 # idem
+    line_type: SOLID
+  - id: humidity_graph_24h
+    sensor: humidity
+    duration: 24h
+    x_grid: 4h
+    width: 151
+    height: 51
+    max_range: 100
+    min_range: 1
+    max_value: 100
+    min_value: 1
+    color: green
+    line_type: SOLID
+  - id: pressure_graph_24h
+    sensor: pres_bmp280
+    duration: 24h
+    x_grid: 4h
+    width: 151
+    height: 51
+    color: magenta
+    max_range: 100
+    min_range: 1
+    max_value: 1050
+    min_value: 950
+    line_type: SOLID
+  - id: co2_graph_24h
+    sensor: co2_scd40
+    duration: 24h
+    x_grid: 4h
+    width: 151
+    height: 51
+    color: cyan
+    max_range: 3000
+    min_range: 1
+    max_value: 3000
+    min_value: 1
+    line_type: SOLID
+  - id: voc_graph_24h
+    sensor: tvoc_sgp30
+    duration: 24h
+    x_grid: 4h
+    width: 151
+    height: 51
+    color: blue
+    max_range: 500
+    min_range: 1
+    max_value: 500
+    min_value: 1
+    line_type: SOLID
 
 display:
   - platform: ili9xxx    
@@ -271,9 +333,20 @@ display:
       auto fl14 = id(font_label_14);
       auto fl18 = id(font_label_18);
 
-      if (id(show_graphics)) {
+      auto w = it.get_width();
+      auto h = it.get_height();
 
-        auto pos = 10;
+      float pressure = id(pres_bmp280).state;
+
+      if (isnan(pressure)) {
+        pressure = 0;
+      }
+    
+      if (id(page_number) == 1) {
+
+        it.printf(w - 10, 0, fl14, id(white),  TextAlign::TOP_RIGHT, "LAST HOUR"      );
+
+        auto pos = 20;
         it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "°C"       );
         it.printf(75, pos + 37, fl18, id(white), TextAlign::BOTTOM_RIGHT, "TEMP"     );
         it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "15..30"   );
@@ -303,10 +376,41 @@ display:
         it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "1..500"   );
         it.graph (80, pos     , id(voc_graph   ));
 
-      } else {
+      } else if (id(page_number) == 2) {
 
-        auto w = it.get_width();
-        auto h = it.get_height();
+        it.printf(w - 10, 0, fl14, id(white),  TextAlign::TOP_RIGHT, "LAST 24 HOURS"  );
+
+        auto pos = 20;
+        it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "°C"       );
+        it.printf(75, pos + 37, fl18, id(white), TextAlign::BOTTOM_RIGHT, "TEMP"     );
+        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "15..30"   );
+        it.graph (80, pos     , id(temperature_graph_24h));
+
+        pos += 60;
+        it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "%cRH", '%');
+        it.printf(75, pos + 37, fl18, id(white), TextAlign::BOTTOM_RIGHT, "HUM"      );
+        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "0..100"   );
+        it.graph (80, pos     , id(humidity_graph_24h   ));
+
+        pos += 60;
+        it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "hPa"      );
+        it.printf(75, pos + 37, fl18, id(white), TextAlign::BOTTOM_RIGHT, "PRESS"    );
+        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "950..1050");
+        it.graph (80, pos     , id(pressure_graph_24h   ));
+
+        pos += 60;
+        it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "ppm"      );
+        it.printf(75, pos + 37, fl18, id(white), TextAlign::BOTTOM_RIGHT, "CO2"      );
+        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "1..3000"  );
+        it.graph (80, pos     , id(co2_graph_24h        ));
+
+        pos += 60;
+        it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "ppb"      );
+        it.printf(75, pos + 37, fl18, id(white), TextAlign::BOTTOM_RIGHT, "VOC"      );
+        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "1..500"   );
+        it.graph (80, pos     , id(voc_graph_24h   ));
+
+      } else {
         
         auto cy = 0; // current Y position
         auto ix = 0; // current X grid position
@@ -405,51 +509,13 @@ display:
         if (pm10 > 80) {col = id(purple); }
         auto pm10_c = col;
 
-        // SELECT FIRST AVAILABLE TEMPERATURE SENSOR
-
-        float temps[5] = { 
-          id(temp_sht40).state, 
-          id(temp_aht20).state, 
-          id(temp_scd40).state, 
-          id(temp_aht20_ens).state, 
-          id(temp_bmp280).state
-        };
-
-        float hums[4] = { 
-          id(hum_sht40).state, 
-          id(hum_aht20).state, 
-          id(hum_scd40).state, 
-          id(hum_aht20_ens).state
-        };
-
-        float pressure = id(pres_bmp280).state;
-        float temp = 0;
-        float hum  = 0;
-
-        for (int i = 0; i < 5; i++) {
-          if (!isnan(temps[i])) { 
-            temp = temps[i]; 
-            break; 
-          }
-        }
-        for (int i = 0; i < 4; i++) {
-          if (!isnan(hums[i])) { 
-            hum = hums[i]; 
-            break; 
-          }
-        }
-
-        if (isnan(pressure)) {
-          pressure = 0;
-        }
-      
         // DRAW TEMPERATURE HUMIDITY and PRESSURE
         it.printf( 65, 18, fl14, id(grey), TextAlign::BOTTOM_LEFT,  "°C"            );
-        it.printf( 65, 34, fv30, white,    TextAlign::BOTTOM_RIGHT, "%.1f", temp    );
+        it.printf( 65, 34, fv30, white,    TextAlign::BOTTOM_RIGHT, "%.1f", id(temperature).state    );
 
         it.printf(125, 18, fl14, id(grey), TextAlign::BOTTOM_LEFT,  "RH"            );
         it.printf(125, 30, fl14, id(grey), TextAlign::BOTTOM_LEFT,  "%c", '%'       );
-        it.printf(125, 34, fv30, white,    TextAlign::BOTTOM_RIGHT, "%.0f", hum     );
+        it.printf(125, 34, fv30, white,    TextAlign::BOTTOM_RIGHT, "%.0f", id(humidity).state     );
 
         it.printf(213, 18, fl14, id(grey), TextAlign::BOTTOM_LEFT,  "hPa"           );
         it.printf(213, 34, fv30, white,    TextAlign::BOTTOM_RIGHT, "%.0f", pressure);
@@ -650,6 +716,46 @@ i2c:
     id: i2c_2
 
 sensor:
+  - platform: template
+    id: temperature
+    update_interval: 10s
+    lambda: |-
+      float temps[6] = { 
+        id(temp_sht40).state, 
+        id(temp_aht20).state, 
+        id(temp_scd40).state, 
+        id(temp_aht20_ens).state, 
+        id(temp_bmp280).state,
+        0
+      };
+
+      for (int i = 0; i < 5; i++) {
+        if (!isnan(temps[i])) { 
+          return temps[i]; 
+        }
+      }
+      return 0.0;
+
+  - platform: template
+    id: humidity
+    update_interval: 10s
+    lambda: |-
+      float hums[5] = { 
+        id(hum_sht40).state, 
+        id(hum_aht20).state, 
+        id(hum_scd40).state, 
+        id(hum_aht20_ens).state, 
+        0
+      };
+
+      for (int i = 0; i < 5; i++) {
+        if (!isnan(hums[i])) { 
+          return hums[i]; 
+        }
+      }
+
+      return 0.0;
+
   - platform: template
     name: "ZE08 CH2O"
     unit_of_measurement: ppb

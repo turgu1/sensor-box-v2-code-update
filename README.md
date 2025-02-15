@@ -8,7 +8,12 @@ See [here](https://www.printables.com/model/1079858-3d-printer-emission-sensor-a
 
 - Code cleanup
 - Added Pressure from bmp280
-- Double-Click for a second page with graphics
+- Double-Click page selection
+- Added two sensors (temperature, humidity)
+  - Selection code for the sensor to use is now in those sensors.
+- Added two pages:
+  - Graphics for the last hour (temperature, humidity, pressure, CO2, VOC)
+  - Graphics for the last 24 hours
 
 ToDo:
 - [x] Add button double-click 
