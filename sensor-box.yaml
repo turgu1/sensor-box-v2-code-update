@@ -197,9 +197,9 @@ graph:
     height: 51
     color: blue
     max_range: 30 # Change values from environement context
-    min_range: 10 # idem
+    min_range: 15 # idem
     max_value: 30 # Change values from environement context
-    min_value: 10 # idem
+    min_value: 15 # idem
     line_type: SOLID
   - id: humidity_graph
     sensor: hum_scd40
@@ -220,10 +220,10 @@ graph:
     width: 151
     height: 51
     color: magenta
-    max_range: 1100
-    min_range: 900
-    max_value: 1100
-    min_value: 900
+    max_range: 1050
+    min_range: 950
+    max_value: 1050
+    min_value: 950
     line_type: SOLID
   - id: co2_graph
     sensor: co2_scd40
@@ -244,9 +244,9 @@ graph:
     width: 151
     height: 51
     color: blue
-    max_range: 1000
+    max_range: 500
     min_range: 1
-    max_value: 1000
+    max_value: 500
     min_value: 1
     line_type: SOLID
 
@@ -276,7 +276,7 @@ display:
         auto pos = 10;
         it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "°C"       );
         it.printf(75, pos + 37, fl18, id(white), TextAlign::BOTTOM_RIGHT, "TEMP"     );
-        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "1..30"    );
+        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "15..30"   );
         it.graph (80, pos     , id(temperature_graph));
 
         pos += 60;
@@ -288,7 +288,7 @@ display:
         pos += 60;
         it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "hPa"      );
         it.printf(75, pos + 37, fl18, id(white), TextAlign::BOTTOM_RIGHT, "PRESS"    );
-        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "900..1100");
+        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "950..1050");
         it.graph (80, pos     , id(pressure_graph   ));
 
         pos += 60;
@@ -300,7 +300,7 @@ display:
         pos += 60;
         it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "ppb"      );
         it.printf(75, pos + 37, fl18, id(white), TextAlign::BOTTOM_RIGHT, "VOC"      );
-        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "1..1000"  );
+        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "1..500"   );
         it.graph (80, pos     , id(voc_graph   ));
 
       } else {
