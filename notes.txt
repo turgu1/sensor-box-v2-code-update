@@ -1,2 +1,2 @@
 To compile:  esphome compile sensor-box.yml
-
+To upload: esphome upload sensor-box.yml

@@ -8,8 +8,10 @@ See [here](https://www.printables.com/model/1079858-3d-printer-emission-sensor-a
 
 - Code cleanup
 - Added Pressure from bmp280
+- Double-Click for a second page with graphics
 
 ToDo:
 - [x] Add button double-click 
-- [ ] Add a graphics page
+- [x] Add a graphics page
 - [ ] MQTT support
+- [ ] Add secrets.yaml support
