@@ -12,3 +12,4 @@ See [here](https://www.printables.com/model/1079858-3d-printer-emission-sensor-a
 ToDo:
 - [x] Add button double-click 
 - [ ] Add a graphics page
+- [ ] MQTT support
