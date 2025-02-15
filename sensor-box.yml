@@ -5,6 +5,10 @@ substitutions:
 # Sensorbox v2 config for PCB SBR1
 # config r2-sal (20241201)
 # https://go.toms3d.org/sbr1
+#
+# Changes by Guy Turcotte: (2015-02-15)
+# - Added double-click capability
+# - Added pmb280 pressure sensor display
 
 esphome:
   name: ${name}
