@@ -7,8 +7,12 @@ substitutions:
 # https://go.toms3d.org/sbr1
 #
 # Changes by Guy Turcotte: (2015-02-15)
-# - Added double-click capability
-# - Added pmb280 pressure sensor display
+# - Added double-click capability for page selection
+# - Added pmb280 pressure sensor display on 1st page
+# - Added pages to show sensors graphics (last hour, last 24 hours)
+# - Added secrets.yml support for hotspot SSID and password
+# - Added temperature and humidity template sensors, selection code
+#   for the sensor to use is now under these new sensors
 
 esphome:
   name: ${name}
@@ -42,11 +46,15 @@ improv_serial:
 
 wifi:
   # Hotspot (captive portal) for flashing new firmware over wifi, enabled via button long press
-  id: wifi_id
+  id: wifi_hotspot
   enable_on_boot: false
   ap:
-    ssid: "Sensorbox v2"
-    password: "cheeseburger"
+    ssid: !secret hotspot_ssid
+    password: !secret hotspot_password
+    manual_ip:
+      static_ip: 192.168.10.1
+      gateway: 192.168.10.1
+      subnet: 255.255.255.0
     ap_timeout: 1s
   reboot_timeout: 0s
 
@@ -133,6 +141,8 @@ binary_sensor:
               - wifi.disable:
             else:
               - wifi.enable:
+              - lambda: |-
+                  id(page_number) = 0;
 
 font:
   - file: "gfonts://Rubik@300"
@@ -163,7 +173,6 @@ font:
     glyphs: [
       "2",A,C,F,I,O,P,V,W,a,c,e,i,l,r,s,t," "
       ]
-
 
 color:
   - id: white
@@ -245,7 +254,7 @@ graph:
     x_grid: 10min
     width: 151
     height: 51
-    color: blue
+    color: orange
     max_range: 1000
     min_range: 1
     max_value: 1000
@@ -305,7 +314,7 @@ graph:
     x_grid: 4h
     width: 151
     height: 51
-    color: blue
+    color: orange
     max_range: 1000
     min_range: 1
     max_value: 1000
@@ -344,7 +353,7 @@ display:
     
       if (id(page_number) == 1) {
 
-        it.printf(w - 10, 0, fl14, id(white),  TextAlign::TOP_RIGHT, "LAST HOUR"      );
+        it.printf(w - 10, 0, fl14, id(white),  TextAlign::TOP_RIGHT, "LAST HOUR"     );
 
         auto pos = 20;
         it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "°C"       );
@@ -356,29 +365,29 @@ display:
         it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "%cRH", '%');
         it.printf(75, pos + 37, fl18, id(white), TextAlign::BOTTOM_RIGHT, "HUM"      );
         it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "0..100"   );
-        it.graph (80, pos     , id(humidity_graph   ));
+        it.graph (80, pos     , id(humidity_graph));
 
         pos += 60;
         it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "hPa"      );
         it.printf(75, pos + 37, fl18, id(white), TextAlign::BOTTOM_RIGHT, "PRESS"    );
         it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "950..1050");
-        it.graph (80, pos     , id(pressure_graph   ));
+        it.graph (80, pos     , id(pressure_graph));
 
         pos += 60;
         it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "ppm"      );
         it.printf(75, pos + 37, fl18, id(white), TextAlign::BOTTOM_RIGHT, "CO2"      );
         it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "1..3000"  );
-        it.graph (80, pos     , id(co2_graph        ));
+        it.graph (80, pos     , id(co2_graph));
 
         pos += 60;
         it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "ppb"      );
         it.printf(75, pos + 37, fl18, id(white), TextAlign::BOTTOM_RIGHT, "VOC"      );
-        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "1..1000"   );
-        it.graph (80, pos     , id(voc_graph   ));
+        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "1..1000"  );
+        it.graph (80, pos     , id(voc_graph));
 
       } else if (id(page_number) == 2) {
 
-        it.printf(w - 10, 0, fl14, id(white),  TextAlign::TOP_RIGHT, "LAST 24 HOURS"  );
+        it.printf(w - 10, 0, fl14, id(white),  TextAlign::TOP_RIGHT, "LAST 24 HOURS" );
 
         auto pos = 20;
         it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "°C"       );
@@ -390,45 +399,47 @@ display:
         it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "%cRH", '%');
         it.printf(75, pos + 37, fl18, id(white), TextAlign::BOTTOM_RIGHT, "HUM"      );
         it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "0..100"   );
-        it.graph (80, pos     , id(humidity_graph_24h   ));
+        it.graph (80, pos     , id(humidity_graph_24h));
 
         pos += 60;
         it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "hPa"      );
         it.printf(75, pos + 37, fl18, id(white), TextAlign::BOTTOM_RIGHT, "PRESS"    );
         it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "950..1050");
-        it.graph (80, pos     , id(pressure_graph_24h   ));
+        it.graph (80, pos     , id(pressure_graph_24h));
 
         pos += 60;
         it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "ppm"      );
         it.printf(75, pos + 37, fl18, id(white), TextAlign::BOTTOM_RIGHT, "CO2"      );
         it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "1..3000"  );
-        it.graph (80, pos     , id(co2_graph_24h        ));
+        it.graph (80, pos     , id(co2_graph_24h));
 
         pos += 60;
         it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "ppb"      );
         it.printf(75, pos + 37, fl18, id(white), TextAlign::BOTTOM_RIGHT, "VOC"      );
-        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "1..1000"   );
-        it.graph (80, pos     , id(voc_graph_24h   ));
+        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "1..1000"  );
+        it.graph (80, pos     , id(voc_graph_24h));
 
       } else {
         
         auto cy = 0; // current Y position
         auto ix = 0; // current X grid position
 
-        
-        if (!id(wifi_id).is_disabled() and id(uptime_sensor).state > 15) {
+        if (!id(wifi_hotspot).is_disabled() and id(uptime_sensor).state > 15) {
+          auto ap_ssid     = id(wifi_hotspot).get_ap().get_ssid();
+          auto ap_password = id(wifi_hotspot).get_ap().get_password();
+          auto ap_ip       = id(wifi_hotspot).get_ap().get_manual_ip()->static_ip.str();
+
           it.printf(w/2,  20, fh36, id(purple), TextAlign::TOP_CENTER, "WIFI AP");
-          it.printf(w/2, 100, fl14, id(white),  TextAlign::TOP_CENTER, "AP NAME: Sensorbox v2");
-          it.printf(w/2, 130, fl14, id(white),  TextAlign::TOP_CENTER, "PW: cheeseburger");
+          it.printf(w/2, 100, fl14, id(white),  TextAlign::TOP_CENTER, "AP NAME: %s", ap_ssid.c_str());
+          it.printf(w/2, 130, fl14, id(white),  TextAlign::TOP_CENTER, "PW: %s",      ap_password.c_str());
           it.printf(w/2, 180, fl14, id(white),  TextAlign::TOP_CENTER, "Connect to the WiFi AP,");
           it.printf(w/2, 200, fl14, id(white),  TextAlign::TOP_CENTER, "then access the interface at");
-          it.printf(w/2, 220, fl14, id(white),  TextAlign::TOP_CENTER, "http://192.168.4.1/");
+          it.printf(w/2, 220, fl14, id(white),  TextAlign::TOP_CENTER, "http://%s/",  ap_ip.c_str());
           it.printf(w/2, 240, fl14, id(white),  TextAlign::TOP_CENTER, "to upload a new firware file.");
           it.printf(w/2, 270, fl14, id(white),  TextAlign::TOP_CENTER, "SBR1_r2_sal");
           return;
         }
 
-        // Please forgive me. I know this is horrible spaghetti code, but for now it gets the job done. Will eventually move all this to LVGL. 
         // GET SENSOR STATES
         auto col     = id(white);
         
@@ -726,7 +737,6 @@ sensor:
         id(temp_scd40).state, 
         id(temp_aht20_ens).state, 
         id(temp_bmp280).state,
-        0
       };
 
       for (int i = 0; i < 5; i++) {
@@ -740,15 +750,14 @@ sensor:
     id: humidity
     update_interval: 10s
     lambda: |-
-      float hums[5] = { 
+      float hums[4] = { 
         id(hum_sht40).state, 
         id(hum_aht20).state, 
         id(hum_scd40).state, 
         id(hum_aht20_ens).state, 
-        0
       };
 
-      for (int i = 0; i < 5; i++) {
+      for (int i = 0; i < 4; i++) {
         if (!isnan(hums[i])) { 
           return hums[i]; 
         }
