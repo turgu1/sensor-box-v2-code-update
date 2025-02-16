@@ -103,15 +103,14 @@ binary_sensor:
     filters:
       - delayed_on: 10ms
       - delayed_off: 10ms
-    on_double_click:
-      - min_length: 10ms
-        max_length: 350ms
-        then:
-          - lambda: |-
-              id(page_number) = (id(page_number) + 1) % id(page_count);
     on_click: 
+    - min_length: 10ms
+      max_length: 350ms
+      then:
+        - lambda: |-
+            id(page_number) = (id(page_number) + 1) % id(page_count);
     - min_length: 500ms
-      max_length: 1200ms
+      max_length: 3000ms
       then:
         - lambda: |- # This will set the level of brightness
             switch (id(dbright)) {
@@ -132,7 +131,7 @@ binary_sensor:
                 id(back_light).turn_on().set_brightness(0.33).perform(); 
                 break;
             }
-    - min_length: 2000ms  # To permit the update of the firmware through OTA
+    - min_length: 5000ms  # To permit the update of the firmware through OTA
       max_length: 15000ms
       then: 
         - if:
@@ -356,33 +355,33 @@ display:
         it.printf(w - 10, 0, fl14, id(white),  TextAlign::TOP_RIGHT, "LAST HOUR"     );
 
         auto pos = 20;
-        it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "°C"       );
+        it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "°C  30"       );
         it.printf(75, pos + 37, fl18, id(white), TextAlign::BOTTOM_RIGHT, "TEMP"     );
-        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "15..30"   );
+        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "15"   );
         it.graph (80, pos     , id(temperature_graph));
 
         pos += 60;
-        it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "%cRH", '%');
+        it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "%cRH  100", '%');
         it.printf(75, pos + 37, fl18, id(white), TextAlign::BOTTOM_RIGHT, "HUM"      );
-        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "0..100"   );
+        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "0"   );
         it.graph (80, pos     , id(humidity_graph));
 
         pos += 60;
-        it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "hPa"      );
+        it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "hPa  1050"      );
         it.printf(75, pos + 37, fl18, id(white), TextAlign::BOTTOM_RIGHT, "PRESS"    );
-        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "950..1050");
+        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "950");
         it.graph (80, pos     , id(pressure_graph));
 
         pos += 60;
-        it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "ppm"      );
+        it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "ppm  3000"      );
         it.printf(75, pos + 37, fl18, id(white), TextAlign::BOTTOM_RIGHT, "CO2"      );
-        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "1..3000"  );
+        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "0"  );
         it.graph (80, pos     , id(co2_graph));
 
         pos += 60;
-        it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "ppb"      );
+        it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "ppb  1000"      );
         it.printf(75, pos + 37, fl18, id(white), TextAlign::BOTTOM_RIGHT, "VOC"      );
-        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "1..1000"  );
+        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "0"  );
         it.graph (80, pos     , id(voc_graph));
 
       } else if (id(page_number) == 2) {
@@ -390,33 +389,33 @@ display:
         it.printf(w - 10, 0, fl14, id(white),  TextAlign::TOP_RIGHT, "LAST 24 HOURS" );
 
         auto pos = 20;
-        it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "°C"       );
+        it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "°C  30"       );
         it.printf(75, pos + 37, fl18, id(white), TextAlign::BOTTOM_RIGHT, "TEMP"     );
-        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "15..30"   );
+        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "15"   );
         it.graph (80, pos     , id(temperature_graph_24h));
 
         pos += 60;
-        it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "%cRH", '%');
+        it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "%cRH  100", '%');
         it.printf(75, pos + 37, fl18, id(white), TextAlign::BOTTOM_RIGHT, "HUM"      );
-        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "0..100"   );
+        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "0"   );
         it.graph (80, pos     , id(humidity_graph_24h));
 
         pos += 60;
-        it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "hPa"      );
+        it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "hPa  1050"      );
         it.printf(75, pos + 37, fl18, id(white), TextAlign::BOTTOM_RIGHT, "PRESS"    );
-        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "950..1050");
+        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "950");
         it.graph (80, pos     , id(pressure_graph_24h));
 
         pos += 60;
-        it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "ppm"      );
+        it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "ppm  3000"      );
         it.printf(75, pos + 37, fl18, id(white), TextAlign::BOTTOM_RIGHT, "CO2"      );
-        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "1..3000"  );
+        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "0"  );
         it.graph (80, pos     , id(co2_graph_24h));
 
         pos += 60;
-        it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "ppb"      );
+        it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "ppb  1000"      );
         it.printf(75, pos + 37, fl18, id(white), TextAlign::BOTTOM_RIGHT, "VOC"      );
-        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "1..1000"  );
+        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "0"  );
         it.graph (80, pos     , id(voc_graph_24h));
 
       } else {
