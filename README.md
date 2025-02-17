@@ -41,7 +41,7 @@ Added `secrets.yaml` support. Please use the `secrets.yaml.example`, copy it to 
 Here are some pictures showing the current 3 pages displayed by the SensorBox:
 
 </br></br>
-<img src="./pictures/IMG_2645.jpg" width="150" title="Page 1"/>&nbsp;<img src="./pictures/IMG_2646.jpg" width="150" title="Page 2"/>&nbsp;<img src="./pictures/IMG_2647.jpg" width="150" title="Page 3"/>
+<img src="./pictures/Page1.jpg" width="150" title="Page 1"/>&nbsp;<img src="./pictures/Page2.jpg" width="150" title="Page 2"/>&nbsp;<img src="./pictures/Page3.jpg" width="150" title="Page 3"/>
 </br></br>
 
 ### ToDo:
