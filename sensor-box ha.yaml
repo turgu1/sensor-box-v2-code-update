@@ -1,13 +1,13 @@
 substitutions:
-  name: sensorbox-2-sal
-  friendly_name: "Sensorbox v2 standalone"
+  name: sensorbox-2
+  friendly_name: "Sensorbox V2"
 
 # Sensorbox v2 config for PCB SBR1
-# config r2-sal (20241201)
+# config r3 (20250119)
 # https://go.toms3d.org/sbr1
 #
 # Changes by Guy Turcotte: (2015-02-15)
-# - Added double-click capability for page selection
+# - Added click capability for page selection
 # - Added pmb280 pressure sensor display on 1st page
 # - Added pages to show sensors graphics (last hour, last 24 hours)
 # - Added secrets.yml support for hotspot SSID and password
@@ -24,10 +24,6 @@ esphome:
   project:
     name: esphome.web
     version: dev
-  on_boot: 
-    then:
-      - delay: 10s
-      - wifi.disable:
 
 esp32:
   board: esp32-s2-saola-1
@@ -36,6 +32,8 @@ esp32:
 # Enable logging
 logger:
 
+# Enable Home Assistant API and failsafe mechanisms
+api:
 
 # Allow Over-The-Air updates
 ota:
@@ -45,22 +43,22 @@ ota:
 improv_serial:
 
 wifi:
-  # Hotspot (captive portal) for flashing new firmware over wifi, enabled via button long press
-  id: wifi_hotspot
-  enable_on_boot: false
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  
   ap:
     ssid: !secret hotspot_ssid
     password: !secret hotspot_password
-    manual_ip:
-      static_ip: 192.168.10.1
-      gateway: 192.168.10.1
-      subnet: 255.255.255.0
-    ap_timeout: 1s
-  reboot_timeout: 0s
 
 # In combination with the `ap` this allows the user
 # to provision wifi credentials to the device via WiFi AP.
-captive_portal:
+
+dashboard_import:
+  package_import_url: github://esphome/firmware/esphome-web/esp32s2.yaml@main
+  import_full_config: true
+
+# To have a "next url" for improv serial
+web_server:
 
 debug:
   update_interval: 5s
@@ -109,7 +107,7 @@ binary_sensor:
       then:
         - lambda: |-
             id(page_number) = (id(page_number) + 1) % id(page_count);
-    - min_length: 500ms
+    - min_length: 750ms
       max_length: 3000ms
       then:
         - lambda: |- # This will set the level of brightness
@@ -422,22 +420,6 @@ display:
         
         auto cy = 0; // current Y position
         auto ix = 0; // current X grid position
-
-        if (!id(wifi_hotspot).is_disabled() and id(uptime_sensor).state > 15) {
-          auto ap_ssid     = id(wifi_hotspot).get_ap().get_ssid();
-          auto ap_password = id(wifi_hotspot).get_ap().get_password();
-          auto ap_ip       = id(wifi_hotspot).get_ap().get_manual_ip()->static_ip.str();
-
-          it.printf(w/2,  20, fh36, id(purple), TextAlign::TOP_CENTER, "WIFI AP");
-          it.printf(w/2, 100, fl14, id(white),  TextAlign::TOP_CENTER, "AP NAME: %s", ap_ssid.c_str());
-          it.printf(w/2, 130, fl14, id(white),  TextAlign::TOP_CENTER, "PW: %s",      ap_password.c_str());
-          it.printf(w/2, 180, fl14, id(white),  TextAlign::TOP_CENTER, "Connect to the WiFi AP,");
-          it.printf(w/2, 200, fl14, id(white),  TextAlign::TOP_CENTER, "then access the interface at");
-          it.printf(w/2, 220, fl14, id(white),  TextAlign::TOP_CENTER, "http://%s/",  ap_ip.c_str());
-          it.printf(w/2, 240, fl14, id(white),  TextAlign::TOP_CENTER, "to upload a new firware file.");
-          it.printf(w/2, 270, fl14, id(white),  TextAlign::TOP_CENTER, "SBR1_r2_sal");
-          return;
-        }
 
         // GET SENSOR STATES
         auto col     = id(white);

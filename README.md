@@ -1,10 +1,22 @@
 # My Sensor Box V2 Software Updates
 
-Some updates to the SensorBox DIY project configuration file (standalone).
+Some updates to the SensorBox DIY project configuration files.
 
 See [here](https://www.printables.com/model/1079858-3d-printer-emission-sensor-array-sensorbox-v2) for more info.
 
-(2025-02-15)
+## (2025-02-19)
+
+### New code versions
+
+There is now three version of the software available here:
+
+- The Standalone Version (`sensor-box standalone.yaml`)
+- The Home Assistant Version (`sensor-box ha.yaml`)
+- The MQTT Version (`sensor-box mqtt.yaml`) -> Work in progress!
+
+Please note that the MQTT Version is not ready yet. 
+
+## (2025-02-17)
 
 ### Code cleanup
 
