@@ -1,6 +1,19 @@
+# Sensorbox V2 HA
+#
+# This is a configuration for the Sensorbox V2 PCB to be integrated in Home Assistant.
+# It uses the ESP32-S2-Saola-1 board and the ILI9341 display.
+# It is a sensor box with a display that shows the temperature, humidity, pressure, 
+# CO2, and VOC levels.
+# It also has a button to switch between the different pages.
+#
+# The configuration is based on the Sensorbox V2 PCB SBR1.
+# The PCB is available at https://go.toms3d.org/sbr1
+#
+
+
 substitutions:
   name: sensorbox-2
-  friendly_name: "Sensorbox V2"
+  friendly_name: "Sensorbox V2 HA"
 
 # Sensorbox v2 config for PCB SBR1
 # config r3 (20250119)
@@ -107,6 +120,8 @@ binary_sensor:
       then:
         - lambda: |-
             id(page_number) = (id(page_number) + 1) % id(page_count);
+            id(dbright) = 3; 
+            id(back_light).turn_on().set_brightness(1.00).perform();
     - min_length: 750ms
       max_length: 3000ms
       then:
@@ -161,7 +176,7 @@ font:
     size: 30
     bpp: 4
     glyphs: [
-      "0","1","2","3","4","5","6","7","8","9", "."
+      "0","1","2","3","4","5","6","7","8","9", ".", "-"
       ]
   - file: "gfonts://Orbitron"
     id: font_heading_36
@@ -710,6 +725,7 @@ i2c:
 sensor:
   - platform: template
     id: temperature
+    name: "Temperature"
     update_interval: 10s
     lambda: |-
       float temps[6] = { 
@@ -729,6 +745,7 @@ sensor:
 
   - platform: template
     id: humidity
+    name: "Humidity"
     update_interval: 10s
     lambda: |-
       float hums[4] = { 

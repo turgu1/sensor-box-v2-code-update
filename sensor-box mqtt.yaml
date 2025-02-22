@@ -1,3 +1,21 @@
+# A version of the Sensorbox V2 firmware that sends data to an MQTT broker
+#
+# In support of any environment other that Home Assistant. Will produce a
+# JSON string with all the sensor data. The JSON string will be sent to the
+# MQTT broker with the topic defined in the secrets.yaml file.
+#
+# The MQTT broker address, username, password, client_id, topic_prefix and log_topic
+# are defined in the secrets.yaml file.
+#
+# The MQTT broker must be configured to accept the client_id and the topic_prefix
+# as a valid client and topic.
+#
+# The log_topic is used to send log messages to the MQTT broker. The log messages
+# are sent with the log level defined in the secrets.yaml file.
+#
+# Guy Turcotte
+# 2021-02-15
+
 substitutions:
   name: sensorbox-2-mqtt
   friendly_name: "Sensorbox V2 MQTT"
@@ -25,10 +43,6 @@ esphome:
   project:
     name: esphome.web
     version: dev
-  on_boot: 
-    then:
-      - delay: 10s
-      - wifi.disable:
 
 esp32:
   board: esp32-s2-saola-1
@@ -36,7 +50,7 @@ esp32:
     type: arduino
 # Enable logging
 logger:
-
+  level: !secret mqtt_log_level
 
 # Allow Over-The-Air updates
 ota:
@@ -64,8 +78,7 @@ dashboard_import:
 web_server:
 
 mqtt:
-  name: "MQTT"
-  enable_on_boot: false
+  enable_on_boot: true
   reboot_timeout: 0s    # Will not reboot if MQTT server is not available
   broker: !secret mqtt_address
   username: !secret mqtt_username
@@ -73,8 +86,8 @@ mqtt:
   client_id: !secret mqtt_client_id
   topic_prefix: !secret mqtt_topic_prefix
   log_topic: !secret mqtt_log_topic
-  log_level: !secret mqtt_log_level
-  state_topic: !secret mqtt_state_topic
+  discovery: false     # Not for use with Home Assistant
+  discover_ip: false
 
 debug:
   update_interval: 5s
@@ -123,6 +136,8 @@ binary_sensor:
       then:
         - lambda: |-
             id(page_number) = (id(page_number) + 1) % id(page_count);
+            id(dbright) = 3; 
+            id(back_light).turn_on().set_brightness(1.00).perform();
     - min_length: 750ms
       max_length: 3000ms
       then:
@@ -177,7 +192,7 @@ font:
     size: 30
     bpp: 4
     glyphs: [
-      "0","1","2","3","4","5","6","7","8","9", "."
+      "0","1","2","3","4","5","6","7","8","9", ".", "-"
       ]
   - file: "gfonts://Orbitron"
     id: font_heading_36
