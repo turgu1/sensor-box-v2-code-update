@@ -1,5 +1,5 @@
 substitutions:
-  name: sensorbox-2-sal
+  name: sensorbox-2
   friendly_name: "Sensorbox V2 standalone"
 
 # Sensorbox v2 config for PCB SBR1

@@ -17,7 +17,7 @@
 # 2021-02-15
 
 substitutions:
-  name: sensorbox-2-mqtt
+  name: sensorbox-2
   friendly_name: "Sensorbox V2 MQTT"
 
 # Sensorbox v2 config for PCB SBR1
@@ -69,6 +69,8 @@ wifi:
 
 # In combination with the `ap` this allows the user
 # to provision wifi credentials to the device via WiFi AP.
+
+api:
 
 dashboard_import:
   package_import_url: github://esphome/firmware/esphome-web/esp32s2.yaml@main
@@ -786,7 +788,7 @@ sensor:
     filters: 
       - filter_out: 2000.0
       - exponential_moving_average: 
-          send_every: 1
+          send_every: 5
           alpha: 0.5
 
   - platform: uptime
