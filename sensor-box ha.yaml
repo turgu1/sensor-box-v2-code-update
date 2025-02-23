@@ -42,6 +42,11 @@ esp32:
   board: esp32-s2-saola-1
   framework:
     type: arduino
+
+psram:
+  mode: octal
+  speed: 80MHz
+
 # Enable logging
 logger:
 
@@ -517,15 +522,15 @@ display:
         auto pm10_c = col;
 
         // DRAW TEMPERATURE HUMIDITY and PRESSURE
-        it.printf( 65, 18, fl14, id(grey), TextAlign::BOTTOM_LEFT,  "°C"            );
-        it.printf( 65, 34, fv30, white,    TextAlign::BOTTOM_RIGHT, "%.1f", id(temperature).state    );
+        it.printf( 75, 18, fl14, id(grey), TextAlign::BOTTOM_LEFT,  "°C"            );
+        it.printf( 75, 34, fv30, white,    TextAlign::BOTTOM_RIGHT, "%.1f", id(temperature).state    );
 
         it.printf(125, 18, fl14, id(grey), TextAlign::BOTTOM_LEFT,  "RH"            );
         it.printf(125, 30, fl14, id(grey), TextAlign::BOTTOM_LEFT,  "%c", '%'       );
         it.printf(125, 34, fv30, white,    TextAlign::BOTTOM_RIGHT, "%.0f", id(humidity).state     );
 
-        it.printf(213, 18, fl14, id(grey), TextAlign::BOTTOM_LEFT,  "hPa"           );
-        it.printf(213, 34, fv30, white,    TextAlign::BOTTOM_RIGHT, "%.0f", pressure);
+        it.printf(215, 18, fl14, id(grey), TextAlign::BOTTOM_LEFT,  "hPa"           );
+        it.printf(215, 34, fv30, white,    TextAlign::BOTTOM_RIGHT, "%.0f", pressure);
 
         // PREPARE VARIABLES
         auto title = "";
@@ -726,6 +731,8 @@ sensor:
   - platform: template
     id: temperature
     name: "Temperature"
+    device_class: "temperature"
+    state_class: "measurement"
     update_interval: 10s
     lambda: |-
       float temps[6] = { 
@@ -746,6 +753,8 @@ sensor:
   - platform: template
     id: humidity
     name: "Humidity"
+    device_class: "humidity"
+    state_class: "measurement"
     update_interval: 10s
     lambda: |-
       float hums[4] = { 
