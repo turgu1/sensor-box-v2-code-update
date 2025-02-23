@@ -4,6 +4,12 @@ Some updates to the SensorBox DIY project configuration files.
 
 See [here](https://www.printables.com/model/1079858-3d-printer-emission-sensor-array-sensorbox-v2) for more info.
 
+## (2025-02-23)
+
+- Correction related to last ESPHome update, added `psram:` definition
+- First line adj for the temerature minus sign required place
+- MQTT support functional. You must adjust sensors' `update_interval:` for your desire
+
 ## (2025-02-21)
 
 - A short click selects next page to show, and also returns the screen to its maximum light.
