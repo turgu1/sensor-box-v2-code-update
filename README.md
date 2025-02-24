@@ -7,7 +7,7 @@ See [here](https://www.printables.com/model/1079858-3d-printer-emission-sensor-a
 ## (2025-02-23)
 
 - Correction related to last ESPHome update, added `psram:` definition
-- First line adj for the temerature minus sign required place
+- First line adj for the temperature minus sign required place
 - MQTT support functional. You must adjust sensors' `update_interval:` for your desire
 
 ## (2025-02-21)
@@ -71,5 +71,5 @@ Here are some pictures showing the current 3 pages displayed by the SensorBox:
 
 - [x] Add button double-click 
 - [x] Add a graphics page
-- [ ] MQTT support
+- [x] MQTT support
 - [x] Add secrets.yaml support
