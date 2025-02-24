@@ -20,7 +20,8 @@ logger:
   
 # Enable Home Assistant API and failsafe mechanisms
 api:
-
+  reboot_timeout: 0s
+  
 # Allow Over-The-Air updates
 ota:
 - platform: esphome

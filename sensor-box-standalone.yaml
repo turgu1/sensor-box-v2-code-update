@@ -23,8 +23,8 @@ packages:
 
 
 wifi:
-  # Comment the following if you want the WiFi to be enabled on boot for 30 seconds
-  enable_on_boot: false
+  # Uncomment the following if you want the WiFi to be disabled on boot
+  # enable_on_boot: false
   ap:
     ap_timeout: 0s
 
