@@ -41,11 +41,9 @@ i2c:
     scl: GPIO12
     scan: true
     id: i2c_main
-    frequency: 800kHz
 
   - sda: GPIO17
     scl: GPIO18
     scan: true
     id: i2c_2
-    frequency: 800kHz
 
