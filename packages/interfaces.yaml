@@ -1,0 +1,51 @@
+uart:
+  - tx_pin: GPIO10
+    rx_pin: GPIO09
+    baud_rate: 9600
+    id: uart_ze08
+    parity: none
+    data_bits: 8
+    stop_bits: 1
+    debug: 
+      direction: BOTH
+      dummy_receiver: true
+      after:
+        # bytes: 9 
+        timeout: 10ms
+      sequence:
+        lambda: |-
+          ESP_LOGD("custom", "Bytes size: %d", bytes.size());
+          // UARTDebug::log_int(direction, bytes, ',');             // Log the message as int. 
+          // UARTDebug::log_hex(direction, bytes, ',');             // Log the message in hex.
+          if (direction == UART_DIRECTION_RX) {
+            if (bytes.size() == 9) {
+              if (bytes[0] == 0xFF && bytes[1] == 0x17) {
+                float value = float((bytes[4] * 256) + bytes[5]);  // Decode message
+                id(ch2o_ze08).publish_state(value);                // Publish results to a sensor.
+              }
+            }
+          }
+
+  - tx_pin: GPIO08
+    rx_pin: GPIO07
+    baud_rate: 9600
+    id: uart_pms
+
+spi:
+  clk_pin: GPIO01
+  mosi_pin: GPIO02
+  miso_pin: GPIO16
+
+i2c:
+  - sda: GPIO11
+    scl: GPIO12
+    scan: true
+    id: i2c_main
+    frequency: 800kHz
+
+  - sda: GPIO17
+    scl: GPIO18
+    scan: true
+    id: i2c_2
+    frequency: 800kHz
+

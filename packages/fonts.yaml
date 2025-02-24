@@ -1,0 +1,29 @@
+font:
+  - file: "gfonts://Rubik@300"
+    id: font_label_14
+    size: 14
+    bpp: 4
+    glyphs: [
+      "0","1","2","3","4","5","6","7","8","9", "µ", "³",  "/", "°", "%", ",", ".", "(", ")", "-", "_", ":", A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z," ",a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z
+      ]
+  - file: "gfonts://Rubik@300"
+    id: font_label_18
+    size: 18
+    bpp: 4
+    glyphs: [
+      "0","1","2","3","4","5","6","7","8","9", "µ", "³",  "/", "°", "%", ",", ".", "(", ")", "-", "_", ":", A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z," ",a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z
+      ]
+  - file: "gfonts://Rubik@400"
+    id: font_value_30
+    size: 30
+    bpp: 4
+    glyphs: [
+      "0","1","2","3","4","5","6","7","8","9", ".", "-"
+      ]
+  - file: "gfonts://Orbitron"
+    id: font_heading_36
+    size: 36
+    bpp: 4
+    glyphs: [
+      "2",A,C,F,I,O,P,V,W,a,c,e,i,l,r,s,t," "
+      ]

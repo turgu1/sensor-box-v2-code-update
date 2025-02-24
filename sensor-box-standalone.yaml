@@ -1,0 +1,36 @@
+# A standalone version of the Sensorbox V2 firmware
+#
+# The configuration is based on the Sensorbox V2 PCB SBR1.
+# The PCB is available at https://go.toms3d.org/sbr1
+#
+# See the README.md file for more information.
+#
+# Guy Turcotte
+# 2021-02-24
+
+substitutions:
+  name: sensorbox-2
+  friendly_name: "Sensorbox V2 standalone"
+
+packages:
+  commons: !include packages/commons.yaml
+  globals: !include packages/globals.yaml
+  wifi: !include packages/wifi.yaml
+  sensors: !include packages/sensors.yaml
+  display: !include packages/display.yaml
+  interfaces: !include packages/interfaces.yaml
+
+
+
+wifi:
+  ap:
+    ap_timeout: 0s
+# Uncomment the following if you don't want the WiFi to be enabled on boot for 30 seconds
+#   enable_on_boot: false
+
+esphome:
+  on_boot: 
+    then:
+      - delay: 30s
+      - wifi.disable:
+

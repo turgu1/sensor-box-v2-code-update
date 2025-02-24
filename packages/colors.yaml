@@ -1,0 +1,24 @@
+color:
+  - id: white
+    hex: FFFFFF
+  - id: grey
+    hex: AAAAAA
+  - id: light_grey
+    hex: CCCCCC
+  - id: yellow
+    hex: FFFA72
+  - id: orange
+    hex: FF9C32
+  - id: red
+    hex: FF1616
+  - id: purple
+    hex: FF16e0
+  - id: blue
+    hex: 0000FF
+  - id: green
+    hex: 00FF00
+  - id: cyan
+    hex: 00FFFF
+  - id: magenta
+    hex: FF00FF
+  

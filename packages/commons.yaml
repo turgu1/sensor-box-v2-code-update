@@ -1,0 +1,27 @@
+esphome:
+  name: ${name}
+  friendly_name: ${friendly_name}
+  min_version: 2025.2.0
+  name_add_mac_suffix: false
+  platformio_options:
+    board_build.flash_mode: dio
+  project:
+    name: esphome.web
+    version: dev
+
+esp32:
+  board: esp32-s2-saola-1
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+  level: WARN
+  
+# Enable Home Assistant API and failsafe mechanisms
+api:
+
+# Allow Over-The-Air updates
+ota:
+- platform: esphome
+

@@ -1,0 +1,13 @@
+globals:
+  - id: dbright # Display dimming brightness
+    type: int
+    restore_value: no
+    initial_value: "0"
+  - id: page_number # current page number (0 = first page)
+    type: int
+    restore_value: no
+    initial_value: "0"
+  - id: page_count
+    type: int
+    restore_value: no
+    initial_value: "3"

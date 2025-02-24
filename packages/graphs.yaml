@@ -1,0 +1,122 @@
+graph:
+  # Show bare-minimum auto-ranged graph
+  - id: temperature_graph
+    sensor: temperature
+    duration: 1h
+    x_grid: 10min
+    width: 151
+    height: 51
+    color: blue
+    max_range: 30 # Change values from environement context
+    min_range: 15 # idem
+    max_value: 30 # Change values from environement context
+    min_value: 15 # idem
+    line_type: SOLID
+  - id: humidity_graph
+    sensor: humidity
+    duration: 1h
+    x_grid: 10min
+    width: 151
+    height: 51
+    max_range: 100
+    min_range: 1
+    max_value: 100
+    min_value: 1
+    color: green
+    line_type: SOLID
+  - id: pressure_graph
+    sensor: pres_bmp280
+    duration: 1h
+    x_grid: 10min
+    width: 151
+    height: 51
+    color: magenta
+    max_range: 100
+    min_range: 1
+    max_value: 1050
+    min_value: 950
+    line_type: SOLID
+  - id: co2_graph
+    sensor: co2_scd40
+    duration: 1h
+    x_grid: 10min
+    width: 151
+    height: 51
+    color: cyan
+    max_range: 3000
+    min_range: 1
+    max_value: 3000
+    min_value: 1
+    line_type: SOLID
+  - id: voc_graph
+    sensor: tvoc_sgp30
+    duration: 1h
+    x_grid: 10min
+    width: 151
+    height: 51
+    color: orange
+    max_range: 1000
+    min_range: 1
+    max_value: 1000
+    min_value: 1
+    line_type: SOLID
+  - id: temperature_graph_24h
+    sensor: temperature
+    duration: 24h
+    x_grid: 4h
+    width: 151
+    height: 51
+    color: blue
+    max_range: 30 # Change values from environement context
+    min_range: 15 # idem
+    max_value: 30 # Change values from environement context
+    min_value: 15 # idem
+    line_type: SOLID
+  - id: humidity_graph_24h
+    sensor: humidity
+    duration: 24h
+    x_grid: 4h
+    width: 151
+    height: 51
+    max_range: 100
+    min_range: 1
+    max_value: 100
+    min_value: 1
+    color: green
+    line_type: SOLID
+  - id: pressure_graph_24h
+    sensor: pres_bmp280
+    duration: 24h
+    x_grid: 4h
+    width: 151
+    height: 51
+    color: magenta
+    max_range: 100
+    min_range: 1
+    max_value: 1050
+    min_value: 950
+    line_type: SOLID
+  - id: co2_graph_24h
+    sensor: co2_scd40
+    duration: 24h
+    x_grid: 4h
+    width: 151
+    height: 51
+    color: cyan
+    max_range: 3000
+    min_range: 1
+    max_value: 3000
+    min_value: 1
+    line_type: SOLID
+  - id: voc_graph_24h
+    sensor: tvoc_sgp30
+    duration: 24h
+    x_grid: 4h
+    width: 151
+    height: 51
+    color: orange
+    max_range: 1000
+    min_range: 1
+    max_value: 1000
+    min_value: 1
+    line_type: SOLID

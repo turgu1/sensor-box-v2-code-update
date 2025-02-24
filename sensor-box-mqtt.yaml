@@ -1,0 +1,32 @@
+# A version of the Sensorbox V2 firmware that sends data to an MQTT broker
+#
+# The MQTT broker address, username, password, client_id, topic_prefix and log_topic
+# are defined in the secrets.yaml file.
+#
+# The MQTT broker must be configured to accept the client_id and the topic_prefix
+# as a valid client and topic.
+#
+# The log_topic is used to send log messages to the MQTT broker. The log messages
+# are sent with the log level defined in the secrets.yaml file.
+#
+# The configuration is based on the Sensorbox V2 PCB SBR1.
+# The PCB is available at https://go.toms3d.org/sbr1
+#
+# See the README.md file for more information.
+#
+# Guy Turcotte
+# 2021-02-24
+
+substitutions:
+  name: sensorbox-2
+  friendly_name: "Sensorbox V2 MQTT"
+
+packages:
+  commons: !include packages/commons.yaml
+  globals: !include packages/globals.yaml
+  wifi: !include packages/wifi.yaml
+  sensors: !include packages/sensors.yaml
+  display: !include packages/display.yaml
+  interfaces: !include packages/interfaces.yaml
+  
+  mqtt: !include packages/mqtt.yaml

@@ -1,0 +1,361 @@
+packages:
+  fonts: !include fonts.yaml
+  colors: !include colors.yaml
+  graphs: !include graphs.yaml
+
+psram:
+  mode: octal
+  speed: 80MHz
+
+output:
+  - platform: ledc
+    pin: GPIO15
+    id: backlight_pwm
+
+light:
+  - platform: monochromatic
+    output: backlight_pwm
+    name: "Display Backlight"
+    id: back_light
+    restore_mode: ALWAYS_ON
+
+display:
+  - platform: ili9xxx    
+    model: ILI9341
+    cs_pin: GPIO03
+    dc_pin: GPIO04
+    reset_pin: GPIO06
+    #data_rate: 10MHz
+    transform:
+      #mirror_x: true
+      mirror_y: true
+    #show_test_card: true
+    color_order: bgr # CHANGE THIS if your screen has colors mapped wrong
+    invert_colors: false
+    color_palette: 8BIT
+    lambda: |-
+      it.fill(Color::BLACK);
+
+      auto fv30 = id(font_value_30);
+      auto fh36 = id(font_heading_36);
+      auto fl14 = id(font_label_14);
+      auto fl18 = id(font_label_18);
+
+      auto w = it.get_width();
+      auto h = it.get_height();
+
+      float pressure = id(pres_bmp280).state;
+
+      if (isnan(pressure)) {
+        pressure = 0;
+      }
+    
+      if (id(page_number) == 1) {
+
+        it.printf(w - 10, 0, fl14, id(white),  TextAlign::TOP_RIGHT, "LAST HOUR"     );
+
+        auto pos = 20;
+        it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "°C  30"       );
+        it.printf(75, pos + 37, fl18, id(white), TextAlign::BOTTOM_RIGHT, "TEMP"     );
+        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "15"   );
+        it.graph (80, pos     , id(temperature_graph));
+
+        pos += 60;
+        it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "%cRH  100", '%');
+        it.printf(75, pos + 37, fl18, id(white), TextAlign::BOTTOM_RIGHT, "HUM"      );
+        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "0"   );
+        it.graph (80, pos     , id(humidity_graph));
+
+        pos += 60;
+        it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "hPa  1050"      );
+        it.printf(75, pos + 37, fl18, id(white), TextAlign::BOTTOM_RIGHT, "PRESS"    );
+        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "950");
+        it.graph (80, pos     , id(pressure_graph));
+
+        pos += 60;
+        it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "ppm  3000"      );
+        it.printf(75, pos + 37, fl18, id(white), TextAlign::BOTTOM_RIGHT, "CO2"      );
+        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "0"  );
+        it.graph (80, pos     , id(co2_graph));
+
+        pos += 60;
+        it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "ppb  1000"      );
+        it.printf(75, pos + 37, fl18, id(white), TextAlign::BOTTOM_RIGHT, "VOC"      );
+        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "0"  );
+        it.graph (80, pos     , id(voc_graph));
+
+      } else if (id(page_number) == 2) {
+
+        it.printf(w - 10, 0, fl14, id(white),  TextAlign::TOP_RIGHT, "LAST 24 HOURS" );
+
+        auto pos = 20;
+        it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "°C  30"       );
+        it.printf(75, pos + 37, fl18, id(white), TextAlign::BOTTOM_RIGHT, "TEMP"     );
+        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "15"   );
+        it.graph (80, pos     , id(temperature_graph_24h));
+
+        pos += 60;
+        it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "%cRH  100", '%');
+        it.printf(75, pos + 37, fl18, id(white), TextAlign::BOTTOM_RIGHT, "HUM"      );
+        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "0"   );
+        it.graph (80, pos     , id(humidity_graph_24h));
+
+        pos += 60;
+        it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "hPa  1050"      );
+        it.printf(75, pos + 37, fl18, id(white), TextAlign::BOTTOM_RIGHT, "PRESS"    );
+        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "950");
+        it.graph (80, pos     , id(pressure_graph_24h));
+
+        pos += 60;
+        it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "ppm  3000"      );
+        it.printf(75, pos + 37, fl18, id(white), TextAlign::BOTTOM_RIGHT, "CO2"      );
+        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "0"  );
+        it.graph (80, pos     , id(co2_graph_24h));
+
+        pos += 60;
+        it.printf(75, pos + 15, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "ppb  1000"      );
+        it.printf(75, pos + 37, fl18, id(white), TextAlign::BOTTOM_RIGHT, "VOC"      );
+        it.printf(75, pos + 53, fl14, id(grey),  TextAlign::BOTTOM_RIGHT, "0"  );
+        it.graph (80, pos     , id(voc_graph_24h));
+
+      } else {
+        
+        auto cy = 0; // current Y position
+        auto ix = 0; // current X grid position
+
+        // GET SENSOR STATES
+        auto col     = id(white);
+        
+        auto co2     = id(co2_scd40).state;
+        auto e_co2   = id(eco2_ens160).state;
+        auto s_co2   = id(eco2_sgp30).state;
+        auto ch2o    = id(ch2o_ze08).state;
+        auto e_voc   = id(tvoc_ens160).state;
+        auto s_voc   = id(tvoc_sgp30).state;
+        auto pm1     = id(pm1_pms).state;
+        auto pm25    = id(pm25_pms).state;
+        auto pm10    = id(pm10_pms).state;
+        auto aqi_voc = id(aqi_voc_sgp41).state;
+        auto aqi_nox = id(aqi_nox_sgp41).state;
+
+        // SET COLOR FOR EACH READING
+        
+        col = id(white);
+        if (co2 >  800) { col = id(yellow); }
+        if (co2 > 1200) { col = id(orange); }
+        if (co2 > 1500) { col = id(red);    }
+        if (co2 > 1800) { col = id(purple); }
+        auto co2_c = col;
+
+        col = id(white);
+        if (e_co2 >  800) { col = id(yellow); }
+        if (e_co2 > 1200) { col = id(orange); }
+        if (e_co2 > 1500) { col = id(red);    }
+        if (e_co2 > 1800) { col = id(purple); }
+        auto e_co2_c = col;
+
+        col = id(white);
+        if (s_co2 >  800) { col = id(yellow); }
+        if (s_co2 > 1200) { col = id(orange); }
+        if (s_co2 > 1500) { col = id(red);    }
+        if (s_co2 > 1800) { col = id(purple); }
+        auto s_co2_c = col;
+
+        col = id(white);
+        if (ch2o >  60) { col = id(yellow); }
+        if (ch2o > 100) { col = id(orange); }
+        if (ch2o > 150) { col = id(red);    }
+        if (ch2o > 200) { col = id(purple); }
+        auto ch2o_c = col;
+
+        col = id(white);
+        if (e_voc >  400) {col = id(yellow); }
+        if (e_voc >  800) {col = id(orange); }
+        if (e_voc > 1400) {col = id(red);    }
+        if (e_voc > 2000) {col = id(purple); }
+        auto e_voc_c = col;
+
+        col = id(white);
+        if (s_voc >  300) {col = id(yellow); }
+        if (s_voc >  600) {col = id(orange); }
+        if (s_voc > 1000) {col = id(red);    }
+        if (s_voc > 1500) {col = id(purple); }
+        auto s_voc_c = col;
+
+        col = id(white);
+        if (pm1 >  5) {col = id(yellow); }
+        if (pm1 > 10) {col = id(orange); }
+        if (pm1 > 15) {col = id(red);    }
+        if (pm1 > 25) {col = id(purple); }
+        auto pm1_c = col;
+
+        col = id(white);
+        if (pm25 >  5) {col = id(yellow); }
+        if (pm25 > 10) {col = id(orange); }
+        if (pm25 > 15) {col = id(red);    }
+        if (pm25 > 25) {col = id(purple); }
+        auto pm25_c = col;
+
+        col = id(white);
+        if (pm10 > 15) {col = id(yellow); }
+        if (pm10 > 45) {col = id(orange); }
+        if (pm10 > 60) {col = id(red);    }
+        if (pm10 > 80) {col = id(purple); }
+        auto pm10_c = col;
+
+        // DRAW TEMPERATURE HUMIDITY and PRESSURE
+        it.printf( 75, 18, fl14, id(grey), TextAlign::BOTTOM_LEFT,  "°C"            );
+        it.printf( 75, 34, fv30, white,    TextAlign::BOTTOM_RIGHT, "%.1f", id(temperature).state    );
+
+        it.printf(125, 18, fl14, id(grey), TextAlign::BOTTOM_LEFT,  "RH"            );
+        it.printf(125, 30, fl14, id(grey), TextAlign::BOTTOM_LEFT,  "%c", '%'       );
+        it.printf(125, 34, fv30, white,    TextAlign::BOTTOM_RIGHT, "%.0f", id(humidity).state     );
+
+        it.printf(215, 18, fl14, id(grey), TextAlign::BOTTOM_LEFT,  "hPa"           );
+        it.printf(215, 34, fv30, white,    TextAlign::BOTTOM_RIGHT, "%.0f", pressure);
+
+        // PREPARE VARIABLES
+        auto title = "";
+        auto unit  = "";
+        int  count = 0;
+        const char    *names[3];
+        float          values[3];
+        esphome::Color colors[3];
+
+        // PREPARE PARTICLES
+        cy = 30;
+
+        if (!isnan(pm1)) {
+          count     = 0;
+          title     = "Particles";
+          unit      = "µg/m³";
+          names[0]  = "PM1";
+          names[1]  = "PM2.5";
+          names[2]  = "PM10"; //god C++ sucks
+          values[0] = pm1;
+          values[1] = pm25;
+          values[2] = pm10;
+          colors[0] = pm1_c;
+          colors[1] = pm25_c;
+          colors[2] = pm10_c;
+
+          // START REUSABLE
+          it.line(0, cy, w, cy, id(white));
+
+          it.print(    2, cy + 22, fh36, id(light_grey), TextAlign::CENTER_LEFT,  title);
+          it.print(w - 2, cy + 31, fl14, id(grey),       TextAlign::CENTER_RIGHT, unit );
+
+          ix = 0;
+          for (int i = 0; i < 3; i++) {
+            if(isnan(values[i])) continue;
+            it.printf(w / 6 * (1 + ix * 2), cy + 58, fl14, id(grey),  TextAlign::BOTTOM_CENTER, "%s",   names[i] );
+            it.printf(w / 6 * (1 + ix * 2), cy + 50, fv30, colors[i], TextAlign::TOP_CENTER,    "%.0f", values[i]);
+            ix++;
+          }
+          // END REUSABLE
+          
+          cy += 88;
+        }
+
+        // END PARTICLES
+
+        // PREPARE CO2
+
+        if (!isnan(co2) or !isnan(e_co2) or !isnan(s_co2)) {
+          count = 0;
+          title = "CO2";
+          unit = "ppm";
+          names[0] = "SCD40";
+          names[1] = "ENS160 est.";
+          names[2] = "SGP30 est.";
+          values[0] = co2;
+          values[1] = e_co2;
+          values[2] = s_co2;
+          colors[0] = co2_c;
+          colors[1] = e_co2_c;
+          colors[2] = s_co2_c;
+
+
+          // START REUSABLE
+          it.line(0,cy,w,cy,id(white));
+          it.print(  2, cy + 22, fh36, id(light_grey), TextAlign::CENTER_LEFT,  title);
+          it.print(w-2, cy + 31, fl14, id(grey),       TextAlign::CENTER_RIGHT, unit );
+          ix = 0;
+          for (int i = 0; i < 3; i++) {
+            if(isnan(values[i])) continue;
+            it.printf(w / 6 * (1 + ix * 2), cy + 58, fl14, id(grey),  TextAlign::BOTTOM_CENTER, "%s", names[i] );
+            it.printf(w / 6 * (1 + ix * 2), cy + 50, fv30, colors[i], TextAlign::TOP_CENTER, "%.0f",  values[i]);
+            ix++;
+          }
+          // END REUSABLE
+
+          cy += 88;
+        }
+
+        // END CO2
+
+        // PREPARE VOC
+
+        bool draw_general_voc = (!isnan(ch2o) or !isnan(e_voc) or !isnan(s_voc));
+        bool draw_sgp4x = (!isnan(aqi_voc) or !isnan(aqi_nox));
+        if (draw_general_voc or draw_sgp4x) {
+          count = 0;
+          title = "VOC";
+          unit = "ppb";
+          names[0] = "SGP30";
+          names[1] = "ENS160";
+          names[2] = "ZE08-CH2O";
+          values[0] = s_voc;
+          values[1] = e_voc;
+          values[2] = ch2o;
+          colors[0] = s_voc_c;
+          colors[1] = e_voc_c;
+          colors[2] = ch2o_c;
+
+          // START REUSABLE | UNIT CONDITION ADDED
+          it.line(0, cy, w, cy, id(white));
+          it.print(2, cy + 22, fh36, id(light_grey), TextAlign::CENTER_LEFT, title);
+          if (draw_general_voc) {
+            it.print(w - 2, cy + 31, fl14, id(grey), TextAlign::CENTER_RIGHT, unit);
+          }
+          ix = 0;
+          for (int i = 0; i < 3; i++) {
+            if(isnan(values[i])) continue;
+            it.printf(w / 6 * (1 + ix * 2), cy + 58, fl14, id(grey),  TextAlign::BOTTOM_CENTER, "%s",   names[i] );
+            it.printf(w / 6 * (1 + ix * 2), cy + 50, fv30, colors[i], TextAlign::TOP_CENTER,    "%.0f", values[i]);
+            ix++;
+          }
+          // END REUSABLE
+
+          if (draw_general_voc) {
+            cy += 88;
+          } else {
+            cy += 46;
+          }
+        }
+
+        // START SGP4x
+        cy+=2;
+        auto sgp4x = "SGP41";
+        if (isnan(aqi_nox)) sgp4x = "SGP40";
+        if(!isnan(aqi_voc)) {
+          col = id(white);
+          it.printf(  2, cy, fl14, id(grey), TextAlign::CENTER_LEFT,  "%s VOC Index", sgp4x  );
+          it.printf(180, cy, fl14, id(grey), TextAlign::CENTER_LEFT,  "(1 ... 500)"          );
+          it.printf(180, cy, fl14, col,      TextAlign::CENTER_RIGHT, "%.0f ",        aqi_voc);
+          cy+=15;
+        }
+
+        if(!isnan(aqi_nox)) {
+          col = id(white);
+          it.printf(  2, cy, fl14, id(grey), TextAlign::CENTER_LEFT,  "%s NOx Index", sgp4x  );
+          it.printf(180, cy, fl14, id(grey), TextAlign::CENTER_LEFT,  "(1 ... 500)"          );
+          it.printf(180, cy, fl14, col,      TextAlign::CENTER_RIGHT, "%.0f ",        aqi_nox);
+        }
+
+        // END VOC & SGP4x
+      }
+
+    dimensions:
+      height: 320
+      width: 240

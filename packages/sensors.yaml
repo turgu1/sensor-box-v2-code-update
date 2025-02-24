@@ -1,0 +1,280 @@
+# This file is used to define the sensors that will be used in the project
+# It is included in the main configuration file sensor-box%20ha.yaml
+#
+# The sensors are defined in the following order:
+# - Binary sensors
+# - Sensors
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO13
+      mode:
+        input: true
+        pullup: true
+      inverted: true
+    id: top_btn
+    filters:
+      - delayed_on: 10ms
+      - delayed_off: 10ms
+    on_click: 
+    - min_length: 10ms
+      max_length: 350ms
+      then:
+        - lambda: |-
+            id(page_number) = (id(page_number) + 1) % id(page_count);
+            id(dbright) = 3; 
+            id(back_light).turn_on().set_brightness(1.00).perform();
+    - min_length: 750ms
+      max_length: 3000ms
+      then:
+        - lambda: |- # This will set the level of brightness
+            switch (id(dbright)) {
+              case 0: 
+                id(dbright) = 3; 
+                id(back_light).turn_on().set_brightness(1.00).perform();
+                break;
+              case 1: 
+                id(dbright) = 0; 
+                id(back_light).turn_off().perform();
+                break;
+              case 2: 
+                id(dbright) = 1; 
+                id(back_light).turn_on().set_brightness(0.05).perform(); 
+                break;
+              case 3: 
+                id(dbright) = 2; 
+                id(back_light).turn_on().set_brightness(0.33).perform(); 
+                break;
+            }
+    - min_length: 5000ms  # To permit the update of the firmware through OTA
+      max_length: 15000ms
+      then: 
+        - if:
+            condition: wifi.enabled 
+            then:
+              - wifi.disable:
+            else:
+              - wifi.enable:
+              - lambda: |-
+                  id(page_number) = 0;
+
+sensor:
+  - platform: template
+    id: temperature
+    name: "Temperature"
+    device_class: "temperature"
+    state_class: "measurement"
+    update_interval: 10s
+    lambda: |-
+      float temps[6] = { 
+        id(temp_sht40).state, 
+        id(temp_aht20).state, 
+        id(temp_scd40).state, 
+        id(temp_aht20_ens).state, 
+        id(temp_bmp280).state,
+      };
+
+      for (int i = 0; i < 5; i++) {
+        if (!isnan(temps[i])) { 
+          return temps[i]; 
+        }
+      }
+      return 0.0;
+
+  - platform: template
+    id: humidity
+    name: "Humidity"
+    device_class: "humidity"
+    state_class: "measurement"
+    update_interval: 10s
+    lambda: |-
+      float hums[4] = { 
+        id(hum_sht40).state, 
+        id(hum_aht20).state, 
+        id(hum_scd40).state, 
+        id(hum_aht20_ens).state, 
+      };
+
+      for (int i = 0; i < 4; i++) {
+        if (!isnan(hums[i])) { 
+          return hums[i]; 
+        }
+      }
+
+      return 0.0;
+
+  - platform: template
+    name: "ZE08 CH2O"
+    unit_of_measurement: ppb
+    state_class: measurement
+    device_class: volatile_organic_compounds
+    id: ch2o_ze08
+    update_interval: 5s
+    filters: 
+      - filter_out: 2000.0
+      - exponential_moving_average: 
+          send_every: 1
+          alpha: 0.5
+
+  - platform: uptime
+    name: "Uptime"
+    id: uptime_sensor
+    update_interval: 5s
+    disabled_by_default: True
+
+  - platform: debug
+    free:
+      name: "Heap Free"
+      id: heap_free
+      disabled_by_default: True
+    loop_time:
+      name: "Loop Time"
+      id: loop_time
+      disabled_by_default: True
+
+  - platform: aht10
+    #address: 0x38
+    i2c_id: i2c_main
+    variant: AHT20
+    temperature:
+      name: "AHT20 Temperature"
+      id: temp_aht20
+    humidity:
+      name: "AHT20 Humidity"
+      id: hum_aht20
+    update_interval: 10s
+
+  - platform: bmp280_i2c
+    address: 0x77
+    i2c_id: i2c_main
+    temperature:
+      name: "BMP280 Temperature"
+      id: temp_bmp280
+      oversampling: 16x
+    pressure:
+      name: "BMP280 Pressure"
+      id: pres_bmp280
+    update_interval: 10s
+
+  - platform: sht4x
+    #addr 0x44
+    i2c_id: i2c_main
+    temperature:
+      name: "SHT40 Temperature"
+      id: temp_sht40
+    humidity:
+      name: "SHT40 Relative Humidity"
+      id: hum_sht40
+    update_interval: 10s
+
+  - platform: scd4x
+    #address: 0x62
+    i2c_id: i2c_main
+    co2:
+      name: "SCD40 CO2"
+      id: co2_scd40
+    temperature:
+      name: "SCD40 Temperature"
+      id: temp_scd40
+    humidity:
+      name: "SCD40 Humidity"
+      id: hum_scd40
+    update_interval: 30s
+
+  - platform: ens160_i2c
+    address: 0x53
+    i2c_id: i2c_2
+    eco2:
+      name: "ENS160 eCO2"
+      id: eco2_ens160
+    tvoc:
+      name: "ENS160 TVOC"
+      id: tvoc_ens160
+      filters: 
+        - exponential_moving_average: 
+            send_every: 1
+            alpha: 0.5
+    aqi:
+      name: "ENS160 Air Quality Index"
+      id: aqi_ens160
+    update_interval: 10s
+    compensation:
+      temperature: temp_aht20_ens
+      humidity: hum_aht20_ens
+
+  - platform: aht10
+    #address: 0x38
+    i2c_id: i2c_2
+    variant: AHT20
+    temperature:
+      name: "AHT20/ENS160 Temperature"
+      id: temp_aht20_ens
+      disabled_by_default: True
+    humidity:
+      name: "AHT20/ENS160 Humidity"
+      id: hum_aht20_ens
+      disabled_by_default: True
+    update_interval: 10s
+
+  - platform: sgp30
+    i2c_id: i2c_main
+    address: 0x58
+    eco2:
+      name: "SGP30 eCO2"
+      id: eco2_sgp30
+      accuracy_decimals: 0
+      filters: 
+        - exponential_moving_average: 
+            send_every: 1
+            alpha: 0.2
+    tvoc:
+      name: "SGP30 TVOC"
+      id: tvoc_sgp30
+      accuracy_decimals: 1
+      filters: 
+        - exponential_moving_average: 
+            send_every: 1
+            alpha: 0.2
+    store_baseline: yes
+    update_interval: 5s
+    compensation: 
+      humidity_source: hum_aht20
+      temperature_source: temp_aht20
+
+  - platform: sgp4x
+    i2c_id: i2c_main
+    #address: 0x59
+    voc:
+      name: "SGP41 VOC Index"
+      id: aqi_voc_sgp41
+      icon: "mdi:air-filter"
+      device_class: aqi
+      state_class: measurement
+      unit_of_measurement: "index points"
+    nox:
+      name: "SGP41 NOx Index"
+      id: aqi_nox_sgp41
+      icon: "mdi:air-filter"
+      device_class: aqi
+      state_class: measurement
+      unit_of_measurement: "index points"
+    compensation: 
+      humidity_source: hum_aht20
+      temperature_source: temp_aht20
+    store_baseline: True
+    update_interval: 10s
+
+  - platform: pmsx003
+    type: PMSX003 
+    update_interval: 120s
+    uart_id: uart_pms
+    pm_1_0:
+      name: "PMS Particulate Matter <1.0µm Concentration"
+      id: pm1_pms
+    pm_2_5:
+      name: "PMS Particulate Matter <2.5µm Concentration"
+      id: pm25_pms
+    pm_10_0:
+      name: "PMS Particulate Matter <10.0µm Concentration"
+      id: pm10_pms
