@@ -66,10 +66,3 @@ Here are some pictures showing the current 3 pages displayed by the SensorBox:
 </br></br>
 <img src="./pictures/Page1.jpg" width="150" title="Page 1"/>&nbsp;<img src="./pictures/Page2.jpg" width="150" title="Page 2"/>&nbsp;<img src="./pictures/Page3.jpg" width="150" title="Page 3"/>
 </br></br>
-
-### ToDo:
-
-- [x] Add button double-click 
-- [x] Add a graphics page
-- [x] MQTT support
-- [x] Add secrets.yaml support
