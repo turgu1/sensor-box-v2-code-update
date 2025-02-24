@@ -4,19 +4,18 @@ improv_serial:
 wifi:
   ssid: !secret wifi_sta_ssid
   password: !secret wifi_sta_password
+  reboot_timeout: 0s
   
   ap:
     ssid: !secret wifi_ap_ssid
     password: !secret wifi_ap_password
+    ap_timeout: 10s
 
     manual_ip:
       static_ip: 192.168.10.1
       gateway: 192.168.10.1
       subnet: 255.255.255.0
-    ap_timeout: 10s
-    
-  reboot_timeout: 0s
-
+  
 dashboard_import:
   package_import_url: github://esphome/firmware/esphome-web/esp32s2.yaml@main
   import_full_config: true
